@@ -5,3 +5,7 @@ UseTab: Never
 ColumnLimit: 80
 AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: Never
+AlignConsecutiveMacros: AcrossEmptyLines
+AlignConsecutiveDeclarations: AcrossEmptyLines
+PointerAlignment: Right
+
