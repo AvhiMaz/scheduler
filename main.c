@@ -2,13 +2,15 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define MAX_ACCOUNTS 64
-#define PUBKEY_SIZE  32
+#define MAX_ACCOUNTS     64
+#define PUBKEY_SIZE      32
 
-#define TX_PENDING   0
-#define TX_RUNNING   1
-#define TX_DONE      2
-#define TX_FAILED    3
+#define TX_PENDING       0
+#define TX_RUNNING       1
+#define TX_DONE          2
+#define TX_FAILED        3
+
+#define MAX_TRANSACTIONS 256
 
 typedef void (*ExecuteFn)(void *);
 
@@ -22,3 +24,8 @@ typedef struct {
     ExecuteFn execute;
     void     *args;
 } Transaction;
+
+typedef struct {
+    Transaction *data[MAX_TRANSACTIONS];
+    int          size;
+} PriorityQueue;
