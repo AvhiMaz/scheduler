@@ -29,3 +29,24 @@ typedef struct {
     Transaction *data[MAX_TRANSACTIONS];
     int          size;
 } PriorityQueue;
+
+void push_pq(PriorityQueue *pq, Transaction *tx) {
+    pq->data[pq->size] = tx;
+    pq->size++;
+
+    int i = pq->size - 1;
+
+    while (i > 0) {
+        int parent = (i - 1) / 2;
+        if (pq->data[i]->priority_fee > pq->data[parent]->priority_fee) {
+
+            Transaction *temp = pq->data[i];
+            pq->data[i] = pq->data[parent];
+            pq->data[parent] = temp;
+            i = parent;
+
+        } else {
+            break;
+        }
+    }
+}
