@@ -1,3 +1,6 @@
+#ifndef DEFINES_H
+#define DEFINES_H
+
 #define MAX_ACCOUNTS         64
 #define PUBKEY_SIZE          32
 
@@ -14,3 +17,5 @@
 #define LOCKED               1
 
 #define MAX_THREAD_POOL_SIZE 5
+
+#endif
