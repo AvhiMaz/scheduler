@@ -1,10 +1,13 @@
-PHONY: build run all
+PHONY: build run format all
 
 build:
-	gcc main.c priority_queue.c -o main
+	gcc src/main.c src/priority_queue.c -o main
 
 run:
 	./main
 
+format:
+	clang-format -i src/*.c src/*.h
+
 all:
-	make build && make run
+	make format && make build && make run

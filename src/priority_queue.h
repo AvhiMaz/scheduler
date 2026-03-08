@@ -12,5 +12,3 @@ void         push_pq(PriorityQueue *pq, Transaction *tx);
 Transaction *pop_pq(PriorityQueue *pq);
 
 #endif
-
-
