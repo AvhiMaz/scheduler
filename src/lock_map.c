@@ -34,3 +34,38 @@ int lm_lock(LockedHash *lm, char *key) {
 
     return 1;
 }
+
+int lm_unlock(LockedHash *lm, char *key) {
+    int       index = hash(key);
+
+    LockNode *node = lm->buckets[index];
+
+    while (node != NULL) {
+        if (strcmp(node->key, key) == 0) {
+            node->status = 0;
+            return 1;
+        }
+
+        node = node->next;
+    }
+
+    return 0;
+}
+
+int lm_is_locked(LockedHash *lm, char *key) {
+
+    int       index = hash(key);
+
+    LockNode *node = lm->buckets[index];
+
+    while (node != NULL) {
+
+        if (strcmp(node->key, key) == 0) {
+            return node->status;
+        }
+
+        node = node->next;
+    }
+
+    return 0;
+}
