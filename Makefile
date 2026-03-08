@@ -1,7 +1,7 @@
 PHONY: build run format all
 
 build:
-	gcc src/main.c src/priority_queue.c -o main
+	gcc src/main.c src/priority_queue.c src/lock_map.c -o main
 
 run:
 	./main

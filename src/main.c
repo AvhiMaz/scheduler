@@ -1,3 +1,4 @@
+#include "lock_map.h"
 #include "priority_queue.h"
 #include <stdio.h>
 
@@ -17,6 +18,20 @@ int main() {
         Transaction *tx = pop_pq(&pq);
         printf("id=%d fee=%d\n", tx->id, tx->priority_fee);
     }
+
+    LockedHash lm = {0};
+
+    char       key1[32] = "alice";
+    char       key2[32] = "bob";
+
+    lm_lock(&lm, key1);
+    lm_lock(&lm, key2);
+
+    printf("alice locked: %d\n", lm_is_locked(&lm, key1));
+    printf("bob locked:   %d\n", lm_is_locked(&lm, key2));
+
+    lm_unlock(&lm, key1);
+    printf("alice locked: %d\n", lm_is_locked(&lm, key1));
 
     return 0;
 }

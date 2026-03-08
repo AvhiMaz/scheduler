@@ -13,4 +13,9 @@ typedef struct {
     LockNode *buckets[LOCK_MAP_SIZE];
 } LockedHash;
 
+int hash(char *key);
+int lm_lock(LockedHash *lm, char *key);
+int lm_unlock(LockedHash *lm, char *key);
+int lm_is_locked(LockedHash *lm, char *key);
+
 #endif
