@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 void execute_tx(void *args) {
     Transaction *tx = (Transaction *)args;
@@ -76,7 +75,7 @@ int main() {
 
     tp_start(&tp);
 
-    sleep(2);
+    tp_wait(&tp);
     tp_shutdown(&tp);
     lm_free(&tp.lm);
     free(txs);

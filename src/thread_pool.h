@@ -12,6 +12,8 @@ typedef struct {
     pthread_t       thread[MAX_THREAD_POOL_SIZE];
     pthread_mutex_t mutex;
     pthread_cond_t  cond;
+    pthread_cond_t  done_cond;
+    int             pending;
     int             shutdown;
     LockedHash      lm;
 } ThreadPool;
@@ -19,6 +21,7 @@ typedef struct {
 void tp_init(ThreadPool *tp);
 void tp_start(ThreadPool *tp);
 void tp_submit(ThreadPool *tp, Transaction *tx);
+void tp_wait(ThreadPool *tp);
 void tp_shutdown(ThreadPool *tp);
 
 #endif

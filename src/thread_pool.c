@@ -53,6 +53,11 @@ void *worker(void *args) {
                     }
                 }
                 tx->status = TX_DONE;
+                pthread_mutex_lock(&tp->mutex);
+                tp->pending--;
+                if (tp->pending == 0)
+                    pthread_cond_signal(&tp->done_cond);
+                pthread_mutex_unlock(&tp->mutex);
             }
         }
     }
@@ -61,8 +66,9 @@ void *worker(void *args) {
 void tp_init(ThreadPool *tp) {
     tp->queue.size = 0;
     tp->shutdown = 0;
+    tp->pending = 0;
     tp->lm = (LockedHash){0};
-
+    pthread_cond_init(&tp->done_cond, NULL);
     pthread_mutex_init(&tp->mutex, NULL);
     pthread_cond_init(&tp->cond, NULL);
 }
@@ -76,8 +82,16 @@ void tp_start(ThreadPool *tp) {
 void tp_submit(ThreadPool *tp, Transaction *tx) {
 
     pthread_mutex_lock(&tp->mutex);
+    tp->pending++;
     push_pq(&tp->queue, tx);
     pthread_cond_signal(&tp->cond);
+    pthread_mutex_unlock(&tp->mutex);
+}
+
+void tp_wait(ThreadPool *tp) {
+    pthread_mutex_lock(&tp->mutex);
+    while (tp->pending > 0)
+        pthread_cond_wait(&tp->done_cond, &tp->mutex);
     pthread_mutex_unlock(&tp->mutex);
 }
 
