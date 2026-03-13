@@ -4,6 +4,7 @@
 #include "priority_queue.h"
 #include "transaction.h"
 #include <pthread.h>
+#include <stdio.h>
 
 void *worker(void *args) {
     ThreadPool *tp = (ThreadPool *)args;
@@ -32,6 +33,8 @@ void *worker(void *args) {
             }
 
             if (conflict) {
+                printf("conflict: tx id=%d fee=%d requeued\n", tx->id,
+                       tx->priority_fee);
                 push_pq(&tp->queue, tx);
                 pthread_mutex_unlock(&tp->mutex);
             } else {
