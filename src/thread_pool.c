@@ -44,3 +44,15 @@ void tp_submit(ThreadPool *tp, Transaction *tx) {
     pthread_cond_signal(&tp->cond);
     pthread_mutex_unlock(&tp->mutex);
 }
+
+void tp_shutdown(ThreadPool *tp) {
+
+    pthread_mutex_lock(&tp->mutex);
+    tp->shutdown = 1;
+    pthread_cond_broadcast(&tp->cond);
+    pthread_mutex_unlock(&tp->mutex);
+
+    for (int i = 0; i < MAX_THREAD_POOL_SIZE; i++) {
+        pthread_join(tp->thread[i], NULL);
+    }
+}
