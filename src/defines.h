@@ -9,7 +9,7 @@
 #define TX_DONE              2
 #define TX_FAILED            3
 
-#define MAX_TRANSACTIONS     256
+#define MAX_TRANSACTIONS     1024
 
 #define LOCK_MAP_SIZE        256
 

@@ -1,6 +1,8 @@
+#include "../thirdparty/cJSON.h"
 #include "priority_queue.h"
 #include "thread_pool.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -10,65 +12,57 @@ void execute_tx(void *args) {
 }
 
 int main() {
-    Transaction txs[5] = {
-        {.id = 1,
-         .priority_fee = 50,
-         .status = TX_PENDING,
-         .execute = execute_tx,
-         .num_accounts = 2},
-        {.id = 2,
-         .priority_fee = 90,
-         .status = TX_PENDING,
-         .execute = execute_tx,
-         .num_accounts = 2},
-        {.id = 3,
-         .priority_fee = 30,
-         .status = TX_PENDING,
-         .execute = execute_tx,
-         .num_accounts = 1},
-        {.id = 4,
-         .priority_fee = 70,
-         .status = TX_PENDING,
-         .execute = execute_tx,
-         .num_accounts = 2},
-        {.id = 5,
-         .priority_fee = 10,
-         .status = TX_PENDING,
-         .execute = execute_tx,
-         .num_accounts = 1},
-    };
+    FILE *f = fopen("data/transactions.json", "r");
+    if (!f) {
+        printf("failed to open transactions.json\n");
+        return 1;
+    }
+    fseek(f, 0, SEEK_END);
+    long len = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    char *data = malloc(len + 1);
+    fread(data, 1, len, f);
+    data[len] = '\0';
+    fclose(f);
 
-    // tx1: alice(w), bob(w)
-    memcpy(txs[0].accounts[0], "alice", 32);
-    txs[0].is_writable[0] = true;
-    memcpy(txs[0].accounts[1], "bob", 32);
-    txs[0].is_writable[1] = true;
+    cJSON *json = cJSON_Parse(data);
+    free(data);
+    if (!json) {
+        printf("failed to parse json\n");
+        return 1;
+    }
 
-    // tx2: alice(w), charlie(w) this conflicts with tx1 on alice
-    memcpy(txs[1].accounts[0], "alice", 32);
-    txs[1].is_writable[0] = true;
-    memcpy(txs[1].accounts[1], "charlie", 32);
-    txs[1].is_writable[1] = true;
+    int          count = cJSON_GetArraySize(json);
+    Transaction *txs = malloc(sizeof(Transaction) * count);
 
-    // tx3: dave(w) there is no conflict
-    memcpy(txs[2].accounts[0], "dave", 32);
-    txs[2].is_writable[0] = true;
+    for (int i = 0; i < count; i++) {
+        cJSON *item = cJSON_GetArrayItem(json, i);
 
-    // tx4: bob(w), eve(w) there is a conflicts with tx1 on bob
-    memcpy(txs[3].accounts[0], "bob", 32);
-    txs[3].is_writable[0] = true;
-    memcpy(txs[3].accounts[1], "eve", 32);
-    txs[3].is_writable[1] = true;
+        txs[i].id = cJSON_GetObjectItem(item, "id")->valueint;
+        txs[i].priority_fee =
+            cJSON_GetObjectItem(item, "priority_fee")->valueint;
+        txs[i].status = TX_PENDING;
+        txs[i].execute = execute_tx;
+        txs[i].args = &txs[i];
 
-    // tx5: frank(w) there no conflict
-    memcpy(txs[4].accounts[0], "frank", 32);
-    txs[4].is_writable[0] = true;
+        cJSON *accounts = cJSON_GetObjectItem(item, "accounts");
+        cJSON *is_writable = cJSON_GetObjectItem(item, "is_writable");
+        txs[i].num_accounts = cJSON_GetArraySize(accounts);
+
+        for (int j = 0; j < txs[i].num_accounts; j++) {
+            char *acc = cJSON_GetArrayItem(accounts, j)->valuestring;
+            memcpy(txs[i].accounts[j], acc, strlen(acc) + 1);
+            txs[i].is_writable[j] =
+                cJSON_IsTrue(cJSON_GetArrayItem(is_writable, j));
+        }
+    }
+
+    cJSON_Delete(json);
 
     PriorityQueue pq;
     pq.size = 0;
 
-    for (int i = 0; i < 5; i++) {
-        txs[i].args = &txs[i];
+    for (int i = 0; i < count; i++) {
         push_pq(&pq, &txs[i]);
     }
 
@@ -82,9 +76,10 @@ int main() {
 
     tp_start(&tp);
 
-    sleep(1);
+    sleep(2);
     tp_shutdown(&tp);
     lm_free(&tp.lm);
+    free(txs);
 
     return 0;
 }

@@ -1,7 +1,7 @@
 PHONY: build run format all
 
 build:
-	gcc src/main.c src/priority_queue.c src/lock_map.c src/thread_pool.c -o main
+	gcc thirdparty/cJSON.c src/main.c src/priority_queue.c src/lock_map.c src/thread_pool.c -o main
 
 run:
 	./main
