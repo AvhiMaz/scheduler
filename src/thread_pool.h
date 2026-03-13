@@ -2,6 +2,7 @@
 #define THREADPOOL_H
 
 #include "defines.h"
+#include "lock_map.h"
 #include "priority_queue.h"
 #include "transaction.h"
 #include <pthread.h>
@@ -12,6 +13,7 @@ typedef struct {
     pthread_mutex_t mutex;
     pthread_cond_t  cond;
     int             shutdown;
+    LockedHash      lm;
 } ThreadPool;
 
 void tp_init(ThreadPool *tp);
