@@ -14,4 +14,8 @@ typedef struct {
     int             shutdown;
 } ThreadPool;
 
+void tp_init(ThreadPool *tp);
+void tp_submit(ThreadPool *tp, Transaction *tx);
+void tp_shutdown(ThreadPool *tp);
+
 #endif
