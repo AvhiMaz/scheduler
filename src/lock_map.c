@@ -1,4 +1,5 @@
 #include "lock_map.h"
+#include "defines.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -68,4 +69,17 @@ int lm_is_locked(LockedHash *lm, char *key) {
     }
 
     return 0;
+}
+
+void lm_free(LockedHash *lm) {
+
+    for (int i = 0; i < LOCK_MAP_SIZE; i++) {
+        LockNode *node = lm->buckets[i];
+        while (node != NULL) {
+            LockNode *next = node->next;
+            free(node);
+            node = next;
+        }
+        lm->buckets[i] = NULL;
+    }
 }

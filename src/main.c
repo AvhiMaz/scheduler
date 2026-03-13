@@ -84,6 +84,7 @@ int main() {
 
     sleep(1);
     tp_shutdown(&tp);
+    lm_free(&tp.lm);
 
     return 0;
 }

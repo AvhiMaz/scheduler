@@ -40,6 +40,7 @@ void *worker(void *args) {
                         lm_lock(&tp->lm, tx->accounts[i]);
                     }
                 }
+                tx->status = TX_RUNNING;
 
                 pthread_mutex_unlock(&tp->mutex);
                 tx->execute(tx->args);
@@ -48,6 +49,7 @@ void *worker(void *args) {
                         lm_unlock(&tp->lm, tx->accounts[i]);
                     }
                 }
+                tx->status = TX_DONE;
             }
         }
     }
