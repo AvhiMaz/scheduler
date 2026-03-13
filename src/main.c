@@ -9,41 +9,36 @@ void execute_tx(void *args) {
 }
 
 int main() {
+    Transaction txs[30] = {
+        {.id = 1,
+         .priority_fee = 50,
+         .status = TX_PENDING,
+         .execute = execute_tx},
+        {.id = 2,
+         .priority_fee = 90,
+         .status = TX_PENDING,
+         .execute = execute_tx},
+        {.id = 3,
+         .priority_fee = 30,
+         .status = TX_PENDING,
+         .execute = execute_tx},
+        {.id = 4,
+         .priority_fee = 70,
+         .status = TX_PENDING,
+         .execute = execute_tx},
+        {.id = 5,
+         .priority_fee = 10,
+         .status = TX_PENDING,
+         .execute = execute_tx},
+    };
+
     PriorityQueue pq;
     pq.size = 0;
 
-    Transaction t1 = {.id = 1,
-                      .priority_fee = 50,
-                      .status = TX_PENDING,
-                      .execute = execute_tx};
-    Transaction t2 = {.id = 2,
-                      .priority_fee = 90,
-                      .status = TX_PENDING,
-                      .execute = execute_tx};
-    Transaction t3 = {.id = 3,
-                      .priority_fee = 30,
-                      .status = TX_PENDING,
-                      .execute = execute_tx};
-    Transaction t4 = {.id = 4,
-                      .priority_fee = 70,
-                      .status = TX_PENDING,
-                      .execute = execute_tx};
-    Transaction t5 = {.id = 5,
-                      .priority_fee = 10,
-                      .status = TX_PENDING,
-                      .execute = execute_tx};
-
-    t1.args = &t1;
-    t2.args = &t2;
-    t3.args = &t3;
-    t4.args = &t4;
-    t5.args = &t5;
-
-    push_pq(&pq, &t1);
-    push_pq(&pq, &t2);
-    push_pq(&pq, &t3);
-    push_pq(&pq, &t4);
-    push_pq(&pq, &t5);
+    for (int i = 0; i < 5; i++) {
+        txs[i].args = &txs[i];
+        push_pq(&pq, &txs[i]);
+    }
 
     ThreadPool tp;
     tp_init(&tp);
@@ -52,6 +47,8 @@ int main() {
         Transaction *tx = pop_pq(&pq);
         tp_submit(&tp, tx);
     }
+
+    tp_start(&tp);
 
     sleep(1);
     tp_shutdown(&tp);

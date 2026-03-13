@@ -31,7 +31,9 @@ void tp_init(ThreadPool *tp) {
 
     pthread_mutex_init(&tp->mutex, NULL);
     pthread_cond_init(&tp->cond, NULL);
+}
 
+void tp_start(ThreadPool *tp) {
     for (int i = 0; i < MAX_THREAD_POOL_SIZE; i++) {
         pthread_create(&tp->thread[i], NULL, worker, tp);
     }
