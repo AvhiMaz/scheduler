@@ -1,4 +1,5 @@
-brainstorming something (this is not the final arc).
+scheduler
 
-<img width="1800" height="950" alt="image" src="https://github.com/user-attachments/assets/4d4f2b6e-7ef4-4583-9f90-1f79216a1996" />
+<img width="1065" height="614" alt="image" src="https://github.com/user-attachments/assets/c06ff0c6-e008-4bfe-add5-fc65ecf4038e" />
+
 
