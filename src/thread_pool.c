@@ -1,5 +1,6 @@
 #include "thread_pool.h"
 #include "defines.h"
+#include "transaction.h"
 
 void *worker(void *args) {
     ThreadPool *tp = (ThreadPool *)args;
@@ -7,14 +8,23 @@ void *worker(void *args) {
     while (1) {
         pthread_mutex_lock(&tp->mutex);
 
-        while (tp->queue_size == 0 && !tp->shutdown) {
+        while (tp->queue.size == 0 && !tp->shutdown) {
             pthread_cond_wait(&tp->cond, &tp->mutex);
+        }
+
+        if (tp->shutdown) {
+            pthread_mutex_unlock(&tp->mutex);
+            return NULL;
+        } else {
+            Transaction *tx = pop_pq(&tp->queue);
+            pthread_mutex_unlock(&tp->mutex);
+            tx->execute(tx->args);
         }
     }
 }
 
 void tp_init(ThreadPool *tp) {
-    tp->queue_size = 0;
+    tp->queue.size = 0;
     tp->shutdown = 0;
 
     pthread_mutex_init(&tp->mutex, NULL);
